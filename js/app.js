@@ -1,4 +1,4 @@
-function carregarDados(endpoint, params, callback) {
+function carregarDadosAPI(endpoint, params, callback) {
 
     showModal();
 
@@ -14,7 +14,13 @@ function carregarDados(endpoint, params, callback) {
         })
         .catch(error => {
             hideModal();
-            callback(error.response.data);
-            showAlert('danger', error.response.data, 0);
+            console.log(error);
+
+            if (error.code == 'ERR_NETWORK') {
+                showAlert('danger', 'API Offline', 0);
+            } else {
+                showAlert('danger', error.response.data.message, 0);
+                callback(error.response.data);
+            }
         });
 }

@@ -9,7 +9,7 @@
     <link href="vendor/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="css/custom.css" rel="stylesheet">
     <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="https://cdn.tiny.cloud/1/9ebpappotq2edw5qf3ik3e6m9owenjuy9buc8ddrbngfw88f/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <!--<script src="https://cdn.tiny.cloud/1/9ebpappotq2edw5qf3ik3e6m9owenjuy9buc8ddrbngfw88f/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>-->
 </head>
 
 <body>
