@@ -1,4 +1,4 @@
-function carregarDadosAPI(endpoint, params, callback) {
+function baixarDadosAPI(endpoint, params, callback) {
 
     showModal();
 
