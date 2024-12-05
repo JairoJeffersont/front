@@ -28,8 +28,8 @@
                                 </div>
                                 <div class="col-md-1 col-6">
                                     <select class="form-select form-select-sm" id="tipo" required>
-                                        <option value="PL" selected>PL</option>
-                                        <option value="REQ">REQ</option>
+                                        <option value="PL">PL</option>
+                                        <option value="REQ" selected>REQ</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 col-6">
@@ -54,7 +54,7 @@
 
             <div class="card shadow-sm mb-2">
                 <div class="card-body p-2">
-                    <div class="table-responsive mb-0">
+                    <div class="table-responsive mb-2">
                         <table class="table table-hover table-bordered table-striped mb-0 custom-table">
                             <thead>
                                 <tr>
@@ -89,52 +89,24 @@
 
 <script>
     $(document).ready(function() {
-
         let anoAtual = new Date().getFullYear();
 
-        for (let i = 2019; i <= anoAtual; i++) {
+        for (let i = 2019   ; i <= anoAtual; i++) { // mudar
             $("#ano").append(`<option value="${i}">${i}</option>`);
         }
 
-        let ano = $("#ano").val();
-        let itens = $("#itens").val();
-        let pagina = 1;
-        let tipo = $("#tipo").val();
-        let ordem = 'desc';
-        let ordenarPor = 'id';
-        let autoria = $("#autoria").val() === "true";
 
-        carregarDados(ano, itens, pagina, tipo, ordem, ordenarPor, autoria, function(resp) {
-            montarTabela(resp.dados);
+
+        carregarDados(2023, 10, 1, 'req', 'desc', 'id', function(resp){
+            console.log(resp);
         });
 
-        $('#ano, #tipo, #itens, #autoria').change(function() {
-            ano = $("#ano").val();
-            itens = $("#itens").val();
-            tipo = $("#tipo").val();
-            autoria = $("#autoria").val() === "true";
 
-            carregarDados(ano, itens, pagina, tipo, ordem, ordenarPor, autoria, function(resp) {
-                montarTabela(resp.dados);
-            });
-
-        });
     });
 
 
-    function montarTabela(dados) {
-        $("#tabela").empty()
 
-        if (dados && dados.length > 0) {
-            $.each(dados, function(index, proposicao) {
-                $("#tabela").append(`<tr><td style="white-space: nowrap;"><a href="?secao=proposicao&id=${proposicao.proposicao_id}">${proposicao.proposicao_titulo}</td><td>${proposicao.proposicao_ementa}</td><td>${proposicao.proposicao_autoria_unica}</a></td></tr>`);
-            });
-        } else {
-            $("#tabela").append(`<tr style="white-space: nowrap;"><td colspan=2>Nenhum registro encontrado</td></tr>`);
-        }
-    }
-
-    function carregarDados(ano, itens, pagina, tipo, ordem, ordenarPor, autoria, callback) {
+    function carregarDados(ano, itens, pagina, tipo, ordem, ordenarPor, callback) {
 
         var params = {
             ano: ano,
@@ -148,17 +120,7 @@
         baixarDadosAPI('proposicoes', params, function(resp) {
 
             if (resp.status == 200) {
-                var resultados = [];
-
-                $.each(resp.dados, function(index, proposicao) {
-                    if (autoria === proposicao.proposicao_autoria_unica) {
-                        resultados.push(proposicao);
-                    }
-                });
-
-                callback({
-                    dados: resultados
-                });
+                callback(resp)
             }
 
             if (resp.status == 204) {
