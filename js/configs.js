@@ -1,4 +1,4 @@
 const config = {
-    apiUrl: 'https://localhost/api/',
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvX2lkIjoxMDAwLCJ1c3VhcmlvX25vbWUiOiJyb290IiwidXN1YXJpb19lbWFpbCI6ImFkbWluQGFkbWluIiwidXN1YXJpb19uaXZlbCI6MSwiaWF0IjoxNzMzMzk3NTAwLCJleHAiOjE3MzM0ODM5MDB9.Eao4SF7r4puvYgjFkHlF2xzNrkgRHA922-t4ygkuvP0'
+    apiUrl: 'http://localhost:3000/api',
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMCwiZW1haWwiOiJyb290QGVtYWlsLmNvbSIsIm5vbWUiOiJSb290Iiwibml2ZWwiOjEsImlhdCI6MTczMzQ5MDExOCwiZXhwIjoxNzMzNTc2NTE4fQ.0vWaT7NVmw6GwjtfbFbEn3Zq5sgX97s1IfUA6KQG0oQ'
 };

@@ -18,6 +18,8 @@ function baixarDadosAPI(endpoint, params, callback) {
 
             if (error.code == 'ERR_NETWORK') {
                 showAlert('danger', 'API Offline', 0);
+            }if (error.code == 'ERR_BAD_REQUEST') {
+                showAlert('danger', 'URL não encontrada', 0);
             } else {
                 showAlert('danger', error.response.data.message, 0);
                 callback(error.response.data);

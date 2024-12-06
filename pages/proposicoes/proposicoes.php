@@ -91,13 +91,11 @@
     $(document).ready(function() {
         let anoAtual = new Date().getFullYear();
 
-        for (let i = 2019   ; i <= anoAtual; i++) { // mudar
+        for (let i = 2019; i <= anoAtual; i++) { // mudar
             $("#ano").append(`<option value="${i}">${i}</option>`);
         }
 
-
-
-        carregarDados(2023, 10, 1, 'req', 'desc', 'id', function(resp){
+        carregarDados(2024, 10, 1, 'pl', 0, 1, null, function(resp) {
             console.log(resp);
         });
 
@@ -106,28 +104,22 @@
 
 
 
-    function carregarDados(ano, itens, pagina, tipo, ordem, ordenarPor, callback) {
-
-        var params = {
-            ano: ano,
-            itens: itens,
-            pagina: pagina,
-            tipo: tipo,
-            ordem: ordem,
-            ordenarPor: ordenarPor
+    function carregarDados(ano, itens, pagina, tipo, arquivada, autoria_unica, busca, callback) {
+        const params = {
+            ano,
+            itens,
+            pagina,
+            tipo,
+            arquivada,
+            autoria_unica,
+            busca
         };
 
-        baixarDadosAPI('proposicoes', params, function(resp) {
-
-            if (resp.status == 200) {
-                callback(resp)
-            }
-
-            if (resp.status == 204) {
-                showAlert('info', resp.message, 2000);
+        baixarDadosAPI('proposicoes/listar', params, (resp) => {
+            if (resp.status === 200 || resp.status === 204) {
+                if (resp.status === 204) showAlert('info', resp.message, 2000);
                 callback(resp);
             }
         });
-
     }
 </script>
