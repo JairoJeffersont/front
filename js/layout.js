@@ -3,7 +3,7 @@ function showModal() {
 }
 
 function hideModal() {
-    setTimeout(function() {
+    setTimeout(function () {
         $('#modalLoading').modal('hide');
     }, 500);
 }
@@ -27,14 +27,43 @@ function showAlert(type, message, time) {
 
     // Se o tempo for maior que 0, escondemos o alerta após o tempo
     if (time > 0) {
-        setTimeout(function() {
+        setTimeout(function () {
             $alerta.fadeOut();
         }, time);
     }
 }
 
-$('form').on('keydown', function(event) {
+$('form').on('keydown', function (event) {
     if (event.key === "Enter") {
         event.preventDefault(); // Impede o envio do formulário
     }
 });
+
+function montarPagination(resp) {
+    $("#pagination").empty();
+
+    if (resp.links) {
+        // Extrai a página atual a partir do link "atual"
+        const urlAtual = resp.links.atual;
+        const urlObj = new URL(urlAtual);
+        const paginaAtual = parseInt(urlObj.searchParams.get("pagina"));
+
+        // Extrai a página da última página a partir do link "ultima"
+        const urlUltima = resp.links.ultima;
+        const urlUltimaObj = new URL(urlUltima);
+        const totalPaginas = parseInt(urlUltimaObj.searchParams.get("pagina"));
+
+        // Gerar os itens de paginação
+        for (let i = 1; i <= totalPaginas; i++) {
+            const isActive = i === paginaAtual ? 'active' : ''; // Verifica se a página é a atual
+
+            $("#pagination").append(`
+                <li class="page-item ${isActive}" data-pagina="${i}">
+                    <a class="page-link" href="#">${i}</a>
+                </li>
+            `);
+        }
+    }
+}
+
+

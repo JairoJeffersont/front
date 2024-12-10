@@ -92,3 +92,9 @@ a {
         object-fit: cover;
     }
 }
+#pagination {
+    display: flex;
+    flex-wrap: wrap;  /* Permite que a lista quebre para a linha seguinte */
+   
+    gap: 5px;  /* Espaçamento entre os itens */
+}

@@ -4,8 +4,11 @@ $pagina = isset($_GET['secao']) ? $_GET['secao'] :  include 'pages/home/home.php
 
 $rotas = [
     'home' => 'pages/home/home.php',
-    'proposicoes' => 'pages/proposicoes/proposicoes.php'
+    'login' => 'pages/login/login.php',
 
+    'usuarios' => 'pages/usuarios/usuarios.php',
+    'proposicoes' => 'pages/proposicoes/proposicoes.php',
+    'atualizar-proposicoes' => 'pages/proposicoes/atualizar-proposicoes.php'
 
 ];
 

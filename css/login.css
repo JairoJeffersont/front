@@ -23,7 +23,7 @@ input[type="password"] {
     font-weight: 500;
 }
 
-button[type="submit"] {
+.btn-login {
     background-color: #272775;
     color: white;
     border: none;
@@ -36,7 +36,7 @@ button[type="submit"] {
     font-weight: 500;
 }
 
-button[type="submit"]:hover {
+.btn-login:hover {
     background-color: green;
     color: white;
 }
