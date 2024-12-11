@@ -93,12 +93,13 @@
         inserirUsuario();
     };
 
-
     async function inserirUsuario() {
+
         const form = document.getElementById('form_novo');
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
+            showModal();
 
             const formData = new FormData(form);
 
@@ -132,6 +133,7 @@
                 montarTabela();
 
             } catch (e) {
+                hideModal();
                 if (e.error.status == 409) {
                     showAlert('info', e.error.message, 3000);
                 }
