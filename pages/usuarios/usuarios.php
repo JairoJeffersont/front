@@ -12,7 +12,7 @@
             <div class="card mb-2 card-description ">
                 <div class="card-header bg-primary text-white px-2 py-1 card-background"><i class="bi bi-people-fill"></i> Adicionar usuários</div>
                 <div class="card-body p-2">
-                    <p class="card-text mb-0">Todos os campos são obrigatórios (exceto a foto) <br> A foto deve ser em JPG ou PNG</p>
+                    <p class="card-text mb-2">Todos os campos são obrigatórios</p>
                 </div>
             </div>
 
@@ -26,7 +26,7 @@
                             <input type="email" class="form-control form-control-sm" name="usuario_email" placeholder="Email" required>
                         </div>
                         <div class="col-md-2 col-6">
-                            <input type="text" class="form-control form-control-sm" name="usuario_telefone" placeholder="Celular (com DDD)" data-mask="(00) 00000-0000" maxlength="11" required>
+                            <input type="text" class="form-control form-control-sm" name="usuario_telefone" placeholder="Celular (com DDD)" data-mask="(00) 00000-0000" maxlength="15" required>
                         </div>
                         <div class="col-md-2 col-6">
                             <input type="text" class="form-control form-control-sm" name="usuario_aniversario" data-mask="00/00" placeholder="Aniversário (dd/mm)" required>
@@ -160,7 +160,7 @@
                 for (const usuario of response.data.dados) {
                     const linha = `
                                 <tr>
-                                    <td><a href="?secao=proposicao&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
+                                    <td><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
                                     <td>${usuario.usuario_email}</td>
                                     <td>${usuario.usuario_aniversario}</td>
                                     <td>${usuario.usuario_telefone}</td>
