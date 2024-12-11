@@ -13,7 +13,7 @@
             <div class="card mb-2 card-description ">
                 <div class="card-header bg-primary text-white px-2 py-1 card-background"><i class="bi bi-people-fill"></i> Editar usuário</div>
                 <div class="card-body p-2">
-                    <p class="card-text mb-0">Todos os campos são obrigatórios (exceto a foto) <br> A foto deve ser em JPG ou PNG</p>
+                    <p class="card-text mb-0">Todos os campos são obrigatórios</p>
                 </div>
             </div>
 
@@ -33,7 +33,7 @@
                         <div class="col-md-2 col-6">
                             <input type="text" class="form-control form-control-sm" name="usuario_aniversario" data-mask="00/00" placeholder="Aniversário (dd/mm)" required>
                         </div>
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-2 col-12">
                             <select class="form-select form-select-sm" name="usuario_ativo" required>
                                 <option value="true">Ativado</option>
                                 <option value="false" selected>Desativado</option>
@@ -52,7 +52,7 @@
     </div>
 </div>
 
-<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-body p-0">

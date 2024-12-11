@@ -13,6 +13,7 @@
                 <div class="card-header bg-primary text-white px-2 py-1 card-background"><i class="bi bi-people-fill"></i> Adicionar usuários</div>
                 <div class="card-body p-2">
                     <p class="card-text mb-2">Todos os campos são obrigatórios</p>
+                    <p class="card-text mb-0" id="assinaturas"></p>
                 </div>
             </div>
 
@@ -76,7 +77,7 @@
     </div>
 </div>
 
-<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-body p-0">
@@ -90,8 +91,28 @@
 <script>
     window.onload = function() {
         montarTabela();
+        mostrarCliente()
         inserirUsuario();
     };
+
+
+    async function mostrarCliente() {
+        try {
+            const url = `${apiBaseUrl}/clientes?/${localStorage.getItem('cliente_id')}`;
+            const method = 'get';
+
+            const assinaturas = document.getElementById('assinaturas');
+
+            const response = await requestApi(url, method, null, localStorage.getItem('usuario_token'));
+
+            assinaturas.innerHTML = `Quantidade de usuários permitidos na assinatura: <b>${response.data.dados[0].cliente_assinaturas}</b>`;
+
+        } catch (e) {
+            if (e.error.status == 404 || e.error.status == 500) {
+                showAlert('danger', e.error.message, 3000);
+            }
+        }
+    }
 
     async function inserirUsuario() {
 
@@ -130,6 +151,7 @@
                 const response = await requestApi(url, method, dados, localStorage.getItem('usuario_token'));
 
                 showAlert('success', response.data.message, 3000);
+                form.reset();
                 montarTabela();
 
             } catch (e) {
@@ -160,11 +182,11 @@
                 for (const usuario of response.data.dados) {
                     const linha = `
                                 <tr>
-                                    <td><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
-                                    <td>${usuario.usuario_email}</td>
-                                    <td>${usuario.usuario_aniversario}</td>
-                                    <td>${usuario.usuario_telefone}</td>
-                                    <td>${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
+                                    <td style="white-space: nowrap;"><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
+                                    <td style="white-space: nowrap;">${usuario.usuario_email}</td>
+                                    <td style="white-space: nowrap;">${usuario.usuario_aniversario}</td>
+                                    <td style="white-space: nowrap;">${usuario.usuario_telefone}</td>
+                                    <td style="white-space: nowrap;">${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
                                 </tr>
                             `;
                     tabela.insertAdjacentHTML("beforeend", linha);
