@@ -12,8 +12,7 @@
             <div class="card mb-2 card-description ">
                 <div class="card-header bg-primary text-white px-2 py-1 card-background"><i class="bi bi-people-fill"></i> Adicionar usuários</div>
                 <div class="card-body p-2">
-                    <p class="card-text mb-2">Todos os campos são obrigatórios</p>
-                    <p class="card-text mb-0" id="assinaturas"></p>
+                    <p class="card-text mb-0">Todos os campos são obrigatórios</p>
                 </div>
             </div>
 
@@ -34,8 +33,14 @@
                         </div>
                         <div class="col-md-2 col-6">
                             <select class="form-select form-select-sm" name="usuario_ativo" required>
-                                <option value="true">Ativado</option>
-                                <option value="false" selected>Desativado</option>
+                                <option value="1">Ativado</option>
+                                <option value="0" selected>Desativado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <select class="form-select form-select-sm" name="usuario_nivel" required>
+                                <option value="1">Administrador</option>
+                                <option value="2" selected>Assessor</option>
                             </select>
                         </div>
                         <div class="col-md-2 col-6">
@@ -43,6 +48,9 @@
                         </div>
                         <div class="col-md-2 col-6">
                             <input type="password" class="form-control form-control-sm" id="usuario_senha2" name="usuario_senha2" placeholder="Confirme a senha" required>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <input type="file" class="form-control form-control-sm" name="usuario_foto"  required>
                         </div>
                         <div class="col-md-3 col-12">
                             <div class="file-upload">
@@ -89,121 +97,86 @@
 
 
 <script>
-    window.onload = function() {
+    window.onload = () => {
         montarTabela();
-        mostrarCliente()
-        inserirUsuario();
+        configurarFormulario();
     };
 
-
-    async function mostrarCliente() {
+    async function montarTabela() {
         try {
-            const url = `${apiBaseUrl}/clientes?/${localStorage.getItem('cliente_id')}`;
-            const method = 'get';
+            showModal();
+            const {data} = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'GET');
 
-            const assinaturas = document.getElementById('assinaturas');
-
-            const response = await requestApi(url, method, null, localStorage.getItem('usuario_token'));
-
-            assinaturas.innerHTML = `Quantidade de usuários permitidos na assinatura: <b>${response.data.dados[0].cliente_assinaturas}</b>`;
+            document.getElementById("tabela").innerHTML = data.status === 'success' ?
+                data.dados.map(usuario => `
+                    <tr>
+                        <td><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
+                        <td>${usuario.usuario_email}</td>
+                        <td>${usuario.usuario_aniversario}</td>
+                        <td>${usuario.usuario_telefone}</td>
+                        <td>${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
+                    </tr>`).join('') :
+                `<tr><td colspan="5">${data.message}</td></tr>`;
 
         } catch (e) {
-            if (e.error.status == 404 || e.error.status == 500) {
-                showAlert('danger', e.error.message, 3000);
-            }
+            tratarErro(e);
+        } finally {
+            hideModal();
         }
     }
 
-    async function inserirUsuario() {
+    function configurarFormulario() {
+    document.getElementById('form_novo').addEventListener('submit', async event => {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form); // Captura o formulário incluindo arquivos
 
-        const form = document.getElementById('form_novo');
+        if (!validarFormulario(Object.fromEntries(formData))) return;
 
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            showModal();
-
-            const formData = new FormData(form);
-
-            const dados = {};
-            formData.forEach((value, key) => {
-                dados[key] = value;
-            });
-
-            if (dados['usuario_senha'].length < 6) {
-                showAlert('danger', 'A senha deve ter pelo menos 6 caracteres', 3000);
-                return false;
-            }
-
-            if (dados['usuario_senha'] != dados['usuario_senha2']) {
-                showAlert('danger', 'Senhas não conferem', 3000);
-                return false;
-            }
-
-
-            dados['usuario_cliente'] = localStorage.getItem('cliente_id');
-
-            delete dados['usuario_senha2'];
-
-            try {
-                const url = `${apiBaseUrl}/usuarios`;
-                const method = 'POST';
-
-                const response = await requestApi(url, method, dados, localStorage.getItem('usuario_token'));
-
-                showAlert('success', response.data.message, 3000);
-                form.reset();
-                montarTabela();
-
-            } catch (e) {
-                hideModal();
-                if (e.error.status == 409) {
-                    showAlert('info', e.error.message, 3000);
-                }
-
-                if (e.error.status == 404 || e.error.status == 400 || e.error.status == 500) {
-                    showAlert('danger', e.error.message, 3000);
-                }
-            }
-        });
-    }
-
-    async function montarTabela() {
-        showModal();
         try {
-            const url = `${apiBaseUrl}/usuarios?cliente_id=${localStorage.getItem('cliente_id')}`;
-            const method = 'get';
+            showModal();
+            const {data} = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'POST', formData);
 
-            let tabela = document.getElementById("tabela");
-
-            const response = await requestApi(url, method, null, localStorage.getItem('usuario_token'));
-
-            if (response.data.status == 200) {
-                tabela.innerHTML = "";
-                for (const usuario of response.data.dados) {
-                    const linha = `
-                                <tr>
-                                    <td style="white-space: nowrap;"><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
-                                    <td style="white-space: nowrap;">${usuario.usuario_email}</td>
-                                    <td style="white-space: nowrap;">${usuario.usuario_aniversario}</td>
-                                    <td style="white-space: nowrap;">${usuario.usuario_telefone}</td>
-                                    <td style="white-space: nowrap;">${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
-                                </tr>
-                            `;
-                    tabela.insertAdjacentHTML("beforeend", linha);
-                }
-            }
-
-            if (response.data.status == 204) {
-                tabela.innerHTML = "";
-                const linha = `<tr><td colspan="5">${response.data.message}</td></tr>`;
-                tabela.insertAdjacentHTML("beforeend", linha);
-            }
-            hideModal();
+            showAlert('success', data.message, 3000);
+            form.reset();
+            montarTabela();
 
         } catch (e) {
-            if (e.error.status == 404 || e.error.status == 500) {
-                showAlert('danger', e.error.message, 3000);
-            }
+            tratarErro(e);
+        } finally {
+            hideModal();
+        }
+    });
+}
+
+
+    function validarFormulario(dados) {
+        if (dados.usuario_senha.length < 6) {
+            showAlert('danger', 'A senha deve ter pelo menos 6 caracteres', 3000);
+            return false;
+        }
+
+        if (dados.usuario_senha !== dados.usuario_senha2) {
+            showAlert('danger', 'Senhas não conferem', 3000);
+            return false;
+        }
+
+        delete dados.usuario_senha2;
+        return true;
+    }
+
+    function tratarErro(e) {
+        const {
+            status,
+            message
+        } = e.response?.data || {};
+
+        if (status === 'invalid_token' || status === 'token_empty') {
+            window.location.href = '?secao=login';
+        } else if (status === 'error' || status === 'forbidden' || status === 'invalid_email') {
+            showAlert('danger', message, 3000);
+        } else if (status === 'duplicated') {
+            showAlert('info', message, 3000);
         }
     }
 </script>
