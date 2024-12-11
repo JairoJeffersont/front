@@ -1,3 +1,8 @@
+const nome_menu = document.getElementById('nome_usuario_menu');
+nome_menu.textContent = localStorage.getItem('usuario_nome');
+
+
+
 function showModal() {
     $('#modalLoading').modal('show');
 }

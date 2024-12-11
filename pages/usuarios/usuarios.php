@@ -18,8 +18,6 @@
 
             <div class="card shadow-sm mb-2">
                 <div class="card-body p-2">
-
-
                     <form class="row g-2 form_custom" id="form_novo" method="POST" enctype="multipart/form-data">
                         <div class="col-md-6 col-12">
                             <input type="text" class="form-control form-control-sm" name="usuario_nome" placeholder="Nome" required>
@@ -33,16 +31,10 @@
                         <div class="col-md-2 col-6">
                             <input type="text" class="form-control form-control-sm" name="usuario_aniversario" data-mask="00/00" placeholder="Aniversário (dd/mm)" required>
                         </div>
-                        <div class="col-md-1 col-6">
+                        <div class="col-md-2 col-6">
                             <select class="form-select form-select-sm" name="usuario_ativo" required>
-                                <option value="1" selected>Ativado</option>
-                                <option value="0">Desativado</option>
-                            </select>
-                        </div>
-                        <div class="col-md-1 col-6">
-                            <select class="form-select form-select-sm" name="usuario_nivel" required>
-                                <option value="1">Administrador</option>
-                                <option value="2" selected>Assessor</option>
+                                <option value="true">Ativado</option>
+                                <option value="false" selected>Desativado</option>
                             </select>
                         </div>
                         <div class="col-md-2 col-6">
@@ -53,7 +45,6 @@
                         </div>
                         <div class="col-md-3 col-12">
                             <div class="file-upload">
-                                <input type="file" id="file-input" name="foto" style="display: none;" />
                                 <button type="submit" class="btn btn-success btn-sm" name="btn_salvar"><i class="bi bi-floppy-fill"></i> Salvar</button>
                             </div>
                         </div>
@@ -70,14 +61,12 @@
                                 <tr>
                                     <th scope="col">Nome</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Email</th>
                                     <th scope="col">Telefone</th>
-                                    <th scope="col">Nível</th>
                                     <th scope="col">Ativo</th>
-                                    <th scope="col">Criado</th>
                                 </tr>
                             </thead>
-                            <tbody>
-
+                            <tbody id="tabela">
                             </tbody>
                         </table>
                     </div>
@@ -87,7 +76,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-body p-0">
@@ -101,25 +90,96 @@
 <script>
     window.onload = function() {
         montarTabela();
+        inserirUsuario();
     };
 
+
+    async function inserirUsuario() {
+        const form = document.getElementById('form_novo');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const dados = {};
+            formData.forEach((value, key) => {
+                dados[key] = value;
+            });
+
+            if (dados['usuario_senha'].length < 6) {
+                showAlert('danger', 'A senha deve ter pelo menos 6 caracteres', 3000);
+                return false;
+            }
+
+            if (dados['usuario_senha'] != dados['usuario_senha2']) {
+                showAlert('danger', 'Senhas não conferem', 3000);
+                return false;
+            }
+
+
+            dados['usuario_cliente'] = localStorage.getItem('cliente_id');
+
+            delete dados['usuario_senha2'];
+
+            try {
+                const url = `${apiBaseUrl}/usuarios`;
+                const method = 'POST';
+
+                const response = await requestApi(url, method, dados, localStorage.getItem('usuario_token'));
+
+                showAlert('success', response.data.message, 3000);
+                montarTabela();
+
+            } catch (e) {
+                if (e.error.status == 409) {
+                    showAlert('info', e.error.message, 3000);
+                }
+
+                if (e.error.status == 404 || e.error.status == 400 || e.error.status == 500) {
+                    showAlert('danger', e.error.message, 3000);
+                }
+            }
+        });
+    }
+
     async function montarTabela() {
+        showModal();
         try {
-            const url = `http://192.168.0.10:3000/api/usuarios?cliente_id=${localStorage.getItem('cliente_id')}`;
+            const url = `${apiBaseUrl}/usuarios?cliente_id=${localStorage.getItem('cliente_id')}`;
             const method = 'get';
+
+            let tabela = document.getElementById("tabela");
 
             const response = await requestApi(url, method, null, localStorage.getItem('usuario_token'));
 
-            if (response.data.status == 204) {
-                showAlert('info', response.data.message, 3000);
+            if (response.data.status == 200) {
+                tabela.innerHTML = "";
+                for (const usuario of response.data.dados) {
+                    const linha = `
+                                <tr>
+                                    <td><a href="?secao=proposicao&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
+                                    <td>${usuario.usuario_email}</td>
+                                    <td>${usuario.usuario_aniversario}</td>
+                                    <td>${usuario.usuario_telefone}</td>
+                                    <td>${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
+                                </tr>
+                            `;
+                    tabela.insertAdjacentHTML("beforeend", linha);
+                }
             }
 
-        } catch (e) {
+            if (response.data.status == 204) {
+                tabela.innerHTML = "";
+                const linha = `<tr><td colspan="5">${response.data.message}</td></tr>`;
+                tabela.insertAdjacentHTML("beforeend", linha);
+            }
+            hideModal();
 
+        } catch (e) {
             if (e.error.status == 404 || e.error.status == 500) {
                 showAlert('danger', e.error.message, 3000);
             }
-
         }
     }
 </script>

@@ -3,7 +3,6 @@ async function requestApi(url, method, data, token) {
         'Content-Type': 'application/json',
     };
 
-    // Se o token for fornecido, adiciona o Bearer ao cabeçalho
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -11,7 +10,7 @@ async function requestApi(url, method, data, token) {
     const response = await fetch(url, {
         method: method,
         headers: headers,
-        body: data ? JSON.stringify(data) : null,  // Se data for undefined, não envia o corpo
+        body: data ? JSON.stringify(data) : null,  
     });
 
     if (response.status === 200) {

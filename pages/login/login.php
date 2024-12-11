@@ -33,7 +33,7 @@
 <script>
     async function logar() {
         try {
-            const url = 'http://192.168.0.10:3000/api/login';
+            const url = 'http://localhost:3000/api/login';
             const method = 'POST';
 
             const data = {
@@ -56,7 +56,7 @@
 
         } catch (e) {
 
-            if (e.error.status == 404) {
+            if (e.error.status == 404 || e.error.status == 401) {
                 showAlert('info', e.error.message, 3000);
             }
 
