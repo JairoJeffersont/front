@@ -16,8 +16,8 @@ async function requestApi(url, method, data, isMultipart = false) {
             url: url,
             method: method,
             headers: headers,
-            processData: !isMultipart, // Permite envio correto de FormData
-            contentType: isMultipart ? false : 'application/json', // Se multipart, o navegador define o cabeçalho
+            processData: !isMultipart,
+            contentType: isMultipart ? false : 'application/json',
             data: isMultipart ? data : JSON.stringify(data),
             success: function (response) {
                 resolve(response);

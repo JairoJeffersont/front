@@ -13,6 +13,15 @@ function hideModal() {
     }, 500);
 }
 
+$('#file-button').on('click', function () {
+    $('#file-input').click();
+});
+
+$('#file-input').on('change', function () {
+    var fileName = $(this).val().split('\\').pop();
+    $('#file-button').html(fileName ? '<i class="bi bi-check-circle"></i> Ok!' : 'Nada foi enviado');
+});
+
 function showAlert(type, message, time) {
     // Validando os parâmetros
     if (!type || !message) {
@@ -90,6 +99,8 @@ function decodificarJWT() {
         const header = JSON.parse(atob(partes[0]));
 
         const payload = JSON.parse(atob(partes[1]));
+
+        console.log(payload)
 
         $("#nome_usuario_menu").text(payload.usuario_nome)
         $("#perfil_menu").attr('href', `?secao=usuario&id=${payload.usuario_id}`)
