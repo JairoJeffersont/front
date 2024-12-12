@@ -25,7 +25,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="nome_usuario_menu"></span></a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="?secao=usuario&id=<?php echo $_SESSION['usuario_id'] ?>"><i class="bi bi-person-fill"></i> Perfil </a>
+                        <a class="dropdown-item" href="#" id="perfil_menu"><i class="bi bi-person-fill"></i> Perfil </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" id="btn-sair" href="?secao=sair"><i class="bi bi-door-open"></i> Sair</a>
                     </div>

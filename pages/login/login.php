@@ -43,29 +43,32 @@
                 senha: document.getElementById('senha').value
             };
 
-            const response = await requestApi(url, method, data);
+            // Faz a requisição usando o requestApi
+            const response = await requestApi(url, method, data, false); // `false` indica que não é multipart/form-data
 
-            if (response.data.status == 'success') {
-                localStorage.setItem('usuario_id', response.data[0].usuario_id);
-                localStorage.setItem('usuario_nome', response.data[0].usuario_nome);
-                localStorage.setItem('usuario_token', response.data.token);
+            if (response.status === 'success') {
+                localStorage.setItem('usuario_token', response.token);
                 showAlert('success', 'Login feito com sucesso! Aguarde...', 0);
                 setTimeout(function() {
-                    window.location.href = '?secao=usuarios'
-                }, 1000)
+                    window.location.href = '?secao=usuarios';
+                }, 1000);
             }
-
-
         } catch (e) {
+            if (e.xhr && e.xhr.responseJSON) {
+                const responseData = e.xhr.responseJSON;
 
-            if (e.response.data.status == 'not_found' || e.response.data.status == 'wrong_password') {
-                showAlert('danger', e.response.data.message, 3000);
+                if (responseData.status === 'not_found' || responseData.status === 'wrong_password') {
+                    showAlert('danger', responseData.message, 3000);
+                }
+
+                if (responseData.status === 'deactivated') {
+                    showAlert('info', responseData.message, 3000);
+                }
+            } else {
+                console.error('Erro inesperado:', e);
+                showAlert('danger', 'Ocorreu um erro inesperado. Tente novamente mais tarde.', 3000);
             }
-
-            if (e.response.data.status == 'deactivated') {
-                showAlert('info', e.response.data.message, 3000);
-            }
-
         }
+
     }
 </script>

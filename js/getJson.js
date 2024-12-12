@@ -1,18 +1,35 @@
-async function requestApi(url, method, data) {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
+async function requestApi(url, method, data, isMultipart = false) {
+    showModal()
+    const headers = {};
 
-    //if (token) {
-        headers['Authorization-Info'] = `Bearer ${localStorage.getItem('usuario_token')}`;
-    //}
+    const token = localStorage.getItem('usuario_token');
+    if (token) {
+        headers['Authorization-Info'] = `Bearer ${token}`;
+    }
 
-    const response = await axios({
-        url: url,
-        method: method,
-        headers: headers,
-        data: data || null
+    if (!isMultipart) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            method: method,
+            headers: headers,
+            processData: !isMultipart, // Permite envio correto de FormData
+            contentType: isMultipart ? false : 'application/json', // Se multipart, o navegador define o cabeçalho
+            data: isMultipart ? data : JSON.stringify(data),
+            success: function (response) {
+                resolve(response);
+            },
+            error: function (xhr, status, error) {
+                if (xhr.statusText == 'Forbidden' || xhr.statusText == 'Not Found') {
+                    window.location.href = '?secao=login';
+                } else {
+                    reject({ xhr, status, error });
+                }
+            }
+        });
+        hideModal()
     });
-
-    return response
 }

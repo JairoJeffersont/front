@@ -18,8 +18,10 @@
 
             <div class="card shadow-sm mb-2">
                 <div class="card-body p-2">
+
+                    <div id="alerta"></div>
                     <form class="row g-2 form_custom" id="form_novo" method="POST" enctype="multipart/form-data">
-                        <div class="col-md-6 col-12">
+                        <div class="col-md-4 col-12">
                             <input type="text" class="form-control form-control-sm" name="usuario_nome" placeholder="Nome" required>
                         </div>
                         <div class="col-md-2 col-12">
@@ -33,8 +35,8 @@
                         </div>
                         <div class="col-md-2 col-6">
                             <select class="form-select form-select-sm" name="usuario_ativo" required>
-                                <option value="1">Ativado</option>
-                                <option value="0" selected>Desativado</option>
+                                <option value="1" selected>Ativado</option>
+                                <option value="0">Desativado</option>
                             </select>
                         </div>
                         <div class="col-md-2 col-6">
@@ -49,13 +51,12 @@
                         <div class="col-md-2 col-6">
                             <input type="password" class="form-control form-control-sm" id="usuario_senha2" name="usuario_senha2" placeholder="Confirme a senha" required>
                         </div>
-                        <div class="col-md-2 col-6">
-                            <input type="file" class="form-control form-control-sm" name="usuario_foto"  required>
+                        <div class="col-md-4 col-12">
+                            <input type="file" class="form-control form-control-sm" id="usuario_foto" name="usuario_foto">
                         </div>
-                        <div class="col-md-3 col-12">
-                            <div class="file-upload">
-                                <button type="submit" class="btn btn-success btn-sm" name="btn_salvar"><i class="bi bi-floppy-fill"></i> Salvar</button>
-                            </div>
+
+                        <div class="col-md-2 col-12">
+                            <button type="button" class="btn btn-success btn-sm" id="btn_salvar"><i class="bi bi-floppy-fill"></i> Salvar</button>
                         </div>
                     </form>
                 </div>
@@ -63,15 +64,15 @@
 
             <div class="card shadow-sm mb-2">
                 <div class="card-body p-2">
-                    <div id="alerta"></div>
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered table-striped mb-0 custom-table">
                             <thead>
                                 <tr>
                                     <th scope="col">Nome</th>
                                     <th scope="col">Email</th>
-                                    <th scope="col">Email</th>
+                                    <th scope="col">Aniversário</th>
                                     <th scope="col">Telefone</th>
+                                    <th scope="col">Nivel</th>
                                     <th scope="col">Ativo</th>
                                 </tr>
                             </thead>
@@ -97,86 +98,54 @@
 
 
 <script>
-    window.onload = () => {
+    $(document).ready(function() {
         montarTabela();
-        configurarFormulario();
-    };
+        $("#btn_salvar").click(function() {
+            if ($("#usuario_senha").val() !== $("#usuario_senha2").val()) {
+                showAlert('danger', 'Senhas não são iguais', 3000);
+            } else {
+                inserirUsuario();
+            }
+        });
+    });
+
 
     async function montarTabela() {
+        $("#tabela").empty()
         try {
-            showModal();
-            const {data} = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'GET');
-
-            document.getElementById("tabela").innerHTML = data.status === 'success' ?
-                data.dados.map(usuario => `
-                    <tr>
-                        <td><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
-                        <td>${usuario.usuario_email}</td>
-                        <td>${usuario.usuario_aniversario}</td>
-                        <td>${usuario.usuario_telefone}</td>
-                        <td>${usuario.usuario_ativo ? 'Ativo' : 'Desativado'}</td>
-                    </tr>`).join('') :
-                `<tr><td colspan="5">${data.message}</td></tr>`;
-
-        } catch (e) {
-            tratarErro(e);
-        } finally {
-            hideModal();
+            const response = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'GET');
+            if (response.status === 'success' && response.dados) {
+                $.each(response.dados, function(index, usuario) {
+                    $("#tabela").append(
+                        `<tr><td><a href="?secao=usuario&id=${usuario.usuario_id}">${usuario.usuario_nome}</a></td>
+                         <td>${usuario.usuario_email}</td>
+                         <td>${usuario.usuario_aniversario}</td>
+                         <td>${usuario.usuario_telefone}</td>
+                         <td>${usuario.usuario_nivel == 1 ? 'Administrador' : 'Assessor'}</td>
+                         <td>${usuario.usuario_ativo ? 'Sim' : 'Não'}</td></tr>`
+                    );
+                });
+            } else if (response.status === 'empty') {
+                $("#tabela").empty().append(`<tr><td colspan="6">${response.message}</td></tr>`);
+            }
+        } catch (error) {
+            $("#tabela").empty().append(`<tr><td colspan="6">${error.xhr.responseJSON.message}</td></tr>`);
         }
     }
 
-    function configurarFormulario() {
-    document.getElementById('form_novo').addEventListener('submit', async event => {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form); // Captura o formulário incluindo arquivos
-
-        if (!validarFormulario(Object.fromEntries(formData))) return;
-
+    async function inserirUsuario() {
         try {
-            showModal();
-            const {data} = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'POST', formData);
+            const form = document.getElementById('form_novo');
+            const formData = new FormData(form);
 
-            showAlert('success', data.message, 3000);
-            form.reset();
-            montarTabela();
+            const response = await requestApi(`${apiBaseUrl}/?rota=usuarios`, 'POST', formData, true);
 
-        } catch (e) {
-            tratarErro(e);
-        } finally {
-            hideModal();
-        }
-    });
-}
-
-
-    function validarFormulario(dados) {
-        if (dados.usuario_senha.length < 6) {
-            showAlert('danger', 'A senha deve ter pelo menos 6 caracteres', 3000);
-            return false;
-        }
-
-        if (dados.usuario_senha !== dados.usuario_senha2) {
-            showAlert('danger', 'Senhas não conferem', 3000);
-            return false;
-        }
-
-        delete dados.usuario_senha2;
-        return true;
-    }
-
-    function tratarErro(e) {
-        const {
-            status,
-            message
-        } = e.response?.data || {};
-
-        if (status === 'invalid_token' || status === 'token_empty') {
-            window.location.href = '?secao=login';
-        } else if (status === 'error' || status === 'forbidden' || status === 'invalid_email') {
-            showAlert('danger', message, 3000);
-        } else if (status === 'duplicated') {
-            showAlert('info', message, 3000);
+            if (response.status === 'success') {
+                montarTabela();
+                showAlert('success', response.message, 3000)
+            }
+        } catch (error) {
+            showAlert('danger', error.xhr.responseJSON.message, 3000)
         }
     }
 </script>

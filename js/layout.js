@@ -1,11 +1,11 @@
-const nome_menu = document.getElementById('nome_usuario_menu');
-nome_menu.textContent = localStorage.getItem('usuario_nome');
+decodificarJWT()
 
 
 
 function showModal() {
     $('#modalLoading').modal('show');
 }
+
 
 function hideModal() {
     setTimeout(function () {
@@ -68,6 +68,35 @@ function montarPagination(resp) {
                 </li>
             `);
         }
+    }
+}
+
+
+function decodificarJWT() {
+    const token = localStorage.getItem('usuario_token');
+
+    if (!token) {
+        alert('Por favor, insira um token JWT.');
+        return;
+    }
+
+    try {
+        const partes = token.split('.');
+
+        if (partes.length !== 3) {
+            throw new Error('Token JWT inválido.');
+        }
+
+        const header = JSON.parse(atob(partes[0]));
+
+        const payload = JSON.parse(atob(partes[1]));
+
+        $("#nome_usuario_menu").text(payload.usuario_nome)
+        $("#perfil_menu").attr('href', `?secao=usuario&id=${payload.usuario_id}`)
+
+
+    } catch (error) {
+        console.error('Erro ao decodificar o token:', error);
     }
 }
 
